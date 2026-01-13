@@ -1,0 +1,9 @@
+[submodule "CherryECAT"]
+	path = CherryECAT
+	url = https://github.com/cherry-embedded/CherryECAT.git
+[submodule "CherryRB"]
+	path = CherryRB
+	url = https://github.com/cherry-embedded/CherryRB.git
+[submodule "CherrySH"]
+	path = CherrySH
+	url = https://github.com/cherry-embedded/CherrySH.git
