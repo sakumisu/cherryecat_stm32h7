@@ -106,9 +106,6 @@
 #ifdef HAL_DMA_MODULE_ENABLED
 
 /* Private types -------------------------------------------------------------*/
-/** @addtogroup DMA_Private_Types
-  * @{
-  */
 typedef struct
 {
   __IO uint32_t ISR;   /*!< DMA interrupt status register */
@@ -121,9 +118,6 @@ typedef struct
   __IO uint32_t ISR;   /*!< BDMA interrupt status register */
   __IO uint32_t IFCR;  /*!< BDMA interrupt flag clear register */
 } BDMA_Base_Registers;
-/**
-  * @}
-  */
 
 /* Private variables ---------------------------------------------------------*/
 /* Private constants ---------------------------------------------------------*/
@@ -174,7 +168,7 @@ typedef struct
   */
 static void DMA_SetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength);
 static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma);
-static HAL_StatusTypeDef DMA_CheckFifoParam(const DMA_HandleTypeDef *hdma);
+static HAL_StatusTypeDef DMA_CheckFifoParam(DMA_HandleTypeDef *hdma);
 static void DMA_CalcDMAMUXChannelBaseAndMask(DMA_HandleTypeDef *hdma);
 static void DMA_CalcDMAMUXRequestGenBaseAndMask(DMA_HandleTypeDef *hdma);
 
@@ -1733,7 +1727,7 @@ HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_Ca
   *               the configuration information for the specified DMA Stream.
   * @retval HAL state
   */
-HAL_DMA_StateTypeDef HAL_DMA_GetState(const DMA_HandleTypeDef *hdma)
+HAL_DMA_StateTypeDef HAL_DMA_GetState(DMA_HandleTypeDef *hdma)
 {
   return hdma->State;
 }
@@ -1744,7 +1738,7 @@ HAL_DMA_StateTypeDef HAL_DMA_GetState(const DMA_HandleTypeDef *hdma)
   *              the configuration information for the specified DMA Stream.
   * @retval DMA Error Code
   */
-uint32_t HAL_DMA_GetError(const DMA_HandleTypeDef *hdma)
+uint32_t HAL_DMA_GetError(DMA_HandleTypeDef *hdma)
 {
   return hdma->ErrorCode;
 }
@@ -1893,7 +1887,7 @@ static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma)
   *                     the configuration information for the specified DMA Stream.
   * @retval HAL status
   */
-static HAL_StatusTypeDef DMA_CheckFifoParam(const DMA_HandleTypeDef *hdma)
+static HAL_StatusTypeDef DMA_CheckFifoParam(DMA_HandleTypeDef *hdma)
 {
   HAL_StatusTypeDef status = HAL_OK;
 

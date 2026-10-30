@@ -144,7 +144,7 @@ typedef struct __USART_HandleTypeDef
 
   uint16_t                      NbTxDataToProcess;       /*!< Number of data to process during TX ISR execution */
 
-  uint32_t                      SlaveMode;               /*!< Enable/Disable USART SPI Slave Mode. This parameter can be a value
+  uint32_t                      SlaveMode;               /*!< Enable/Disable UART SPI Slave Mode. This parameter can be a value
                                                               of @ref USARTEx_Slave_Mode */
 
   uint32_t                      FifoMode;                /*!< Specifies if the FIFO mode will be used. This parameter can be a value
@@ -706,7 +706,8 @@ typedef  void (*pUSART_CallbackTypeDef)(USART_HandleTypeDef *husart);  /*!< poin
    ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV16)  ? 16U :      \
    ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV32)  ? 32U :      \
    ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV64)  ? 64U :      \
-   ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV128) ? 128U : 256U)
+   ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV128) ? 128U :     \
+   ((__CLOCKPRESCALER__) == USART_PRESCALER_DIV256) ? 256U : 1U)
 
 /** @brief  BRR division operation to set BRR register in 8-bit oversampling mode.
   * @param  __PCLK__ USART clock.
@@ -1111,8 +1112,7 @@ HAL_StatusTypeDef HAL_USART_UnRegisterCallback(USART_HandleTypeDef *husart, HAL_
   */
 
 /* IO operation functions *****************************************************/
-HAL_StatusTypeDef HAL_USART_Transmit(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint16_t Size,
-                                     uint32_t Timeout);
+HAL_StatusTypeDef HAL_USART_Transmit(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint16_t Size, uint32_t Timeout);
 HAL_StatusTypeDef HAL_USART_Receive(USART_HandleTypeDef *husart, uint8_t *pRxData, uint16_t Size, uint32_t Timeout);
 HAL_StatusTypeDef HAL_USART_TransmitReceive(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint8_t *pRxData,
                                             uint16_t Size, uint32_t Timeout);
@@ -1149,8 +1149,8 @@ void HAL_USART_AbortCpltCallback(USART_HandleTypeDef *husart);
   */
 
 /* Peripheral State and Error functions ***************************************/
-HAL_USART_StateTypeDef HAL_USART_GetState(const USART_HandleTypeDef *husart);
-uint32_t               HAL_USART_GetError(const USART_HandleTypeDef *husart);
+HAL_USART_StateTypeDef HAL_USART_GetState(USART_HandleTypeDef *husart);
+uint32_t               HAL_USART_GetError(USART_HandleTypeDef *husart);
 
 /**
   * @}

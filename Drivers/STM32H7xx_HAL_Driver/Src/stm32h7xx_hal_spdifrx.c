@@ -33,12 +33,10 @@
         (##) SPDIFRX pins configuration:
             (+++) Enable the clock for the SPDIFRX GPIOs.
             (+++) Configure these SPDIFRX pins as alternate function pull-up.
-        (##) NVIC configuration if you need to use interrupt process (HAL_SPDIFRX_ReceiveCtrlFlow_IT() and
-             HAL_SPDIFRX_ReceiveDataFlow_IT() API's).
+        (##) NVIC configuration if you need to use interrupt process (HAL_SPDIFRX_ReceiveCtrlFlow_IT() and HAL_SPDIFRX_ReceiveDataFlow_IT() API's).
             (+++) Configure the SPDIFRX interrupt priority.
             (+++) Enable the NVIC SPDIFRX IRQ handle.
-        (##) DMA Configuration if you need to use DMA process (HAL_SPDIFRX_ReceiveDataFlow_DMA() and
-             HAL_SPDIFRX_ReceiveCtrlFlow_DMA() API's).
+        (##) DMA Configuration if you need to use DMA process (HAL_SPDIFRX_ReceiveDataFlow_DMA() and HAL_SPDIFRX_ReceiveCtrlFlow_DMA() API's).
             (+++) Declare a DMA handle structure for the reception of the Data Flow channel.
             (+++) Declare a DMA handle structure for the reception of the Control Flow channel.
             (+++) Enable the DMAx interface clock.
@@ -48,8 +46,8 @@
             (+++) Configure the priority and enable the NVIC for the transfer complete interrupt on the
                 DMA CtrlRx/DataRx channel.
 
-   (#) Program the input selection, re-tries number, wait for activity, channel status selection, data format,
-       stereo mode and masking of user bits using HAL_SPDIFRX_Init() function.
+   (#) Program the input selection, re-tries number, wait for activity, channel status selection, data format, stereo mode and masking of user bits
+       using HAL_SPDIFRX_Init() function.
 
    -@- The specific SPDIFRX interrupts (RXNE/CSRNE and Error Interrupts) will be managed using the macros
        __SPDIFRX_ENABLE_IT() and __SPDIFRX_DISABLE_IT() inside the receive process.
@@ -92,7 +90,7 @@
    =============================================
    [..]
      Below the list of most used macros in SPDIFRX HAL driver.
-      (+) __HAL_SPDIFRX_IDLE: Disable the specified SPDIFRX peripheral (IDLE State)
+      (+) __HAL_SPDIFRX_IDLE: Disable the specified SPDIFRX peripheral (IDEL State)
       (+) __HAL_SPDIFRX_SYNC: Enable the synchronization state of the specified SPDIFRX peripheral (SYNC State)
       (+) __HAL_SPDIFRX_RCV: Enable the receive state of the specified SPDIFRX peripheral (RCV State)
       (+) __HAL_SPDIFRX_ENABLE_IT : Enable the specified SPDIFRX interrupts
@@ -175,13 +173,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-/** @defgroup SPDIFRX_Private_Defines SPDIFRX Private Defines
-  * @{
-  */
-#define SPDIFRX_TIMEOUT_VALUE  10U
-/**
-  * @}
-  */
+#define SPDIFRX_TIMEOUT_VALUE  0xFFFFU
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -195,8 +188,7 @@ static void  SPDIFRX_DMACxHalfCplt(DMA_HandleTypeDef *hdma);
 static void  SPDIFRX_DMAError(DMA_HandleTypeDef *hdma);
 static void  SPDIFRX_ReceiveControlFlow_IT(SPDIFRX_HandleTypeDef *hspdif);
 static void  SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif);
-static HAL_StatusTypeDef  SPDIFRX_WaitOnFlagUntilTimeout(SPDIFRX_HandleTypeDef *hspdif, uint32_t Flag,
-                                                         FlagStatus Status, uint32_t Timeout, uint32_t tickstart);
+static HAL_StatusTypeDef  SPDIFRX_WaitOnFlagUntilTimeout(SPDIFRX_HandleTypeDef *hspdif, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t tickstart);
 /**
   * @}
   */
@@ -246,7 +238,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
   uint32_t tmpreg;
 
   /* Check the SPDIFRX handle allocation */
-  if (hspdif == NULL)
+  if(hspdif == NULL)
   {
     return HAL_ERROR;
   }
@@ -266,7 +258,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
   assert_param(IS_SYMBOL_CLOCK_GEN(hspdif->Init.BackupSymbolClockGen));
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
-  if (hspdif->State == HAL_SPDIFRX_STATE_RESET)
+  if(hspdif->State == HAL_SPDIFRX_STATE_RESET)
   {
     /* Allocate lock resource and initialize it */
     hspdif->Lock = HAL_UNLOCKED;
@@ -277,7 +269,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
     hspdif->CxCpltCallback      = HAL_SPDIFRX_CxCpltCallback;     /* Legacy weak CxCpltCallback     */
     hspdif->ErrorCallback       = HAL_SPDIFRX_ErrorCallback;      /* Legacy weak ErrorCallback      */
 
-    if (hspdif->MspInitCallback == NULL)
+    if(hspdif->MspInitCallback == NULL)
     {
       hspdif->MspInitCallback = HAL_SPDIFRX_MspInit; /* Legacy weak MspInit  */
     }
@@ -286,7 +278,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
     hspdif->MspInitCallback(hspdif);
   }
 #else
-  if (hspdif->State == HAL_SPDIFRX_STATE_RESET)
+  if(hspdif->State == HAL_SPDIFRX_STATE_RESET)
   {
     /* Allocate lock resource and initialize it */
     hspdif->Lock = HAL_UNLOCKED;
@@ -321,14 +313,14 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
              hspdif->Init.ChannelStatusMask |
              hspdif->Init.ValidityBitMask |
              hspdif->Init.ParityErrorMask
-            );
+             );
 
-  if (hspdif->Init.SymbolClockGen == ENABLE)
+  if(hspdif->Init.SymbolClockGen == ENABLE)
   {
     tmpreg |= SPDIFRX_CR_CKSEN;
   }
 
-  if (hspdif->Init.BackupSymbolClockGen == ENABLE)
+  if(hspdif->Init.BackupSymbolClockGen == ENABLE)
   {
     tmpreg |= SPDIFRX_CR_CKSBKPEN;
   }
@@ -351,7 +343,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_Init(SPDIFRX_HandleTypeDef *hspdif)
 HAL_StatusTypeDef HAL_SPDIFRX_DeInit(SPDIFRX_HandleTypeDef *hspdif)
 {
   /* Check the SPDIFRX handle allocation */
-  if (hspdif == NULL)
+  if(hspdif == NULL)
   {
     return HAL_ERROR;
   }
@@ -365,7 +357,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_DeInit(SPDIFRX_HandleTypeDef *hspdif)
   __HAL_SPDIFRX_IDLE(hspdif);
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
-  if (hspdif->MspDeInitCallback == NULL)
+  if(hspdif->MspDeInitCallback == NULL)
   {
     hspdif->MspDeInitCallback = HAL_SPDIFRX_MspDeInit; /* Legacy weak MspDeInit  */
   }
@@ -435,12 +427,11 @@ __weak void HAL_SPDIFRX_MspDeInit(SPDIFRX_HandleTypeDef *hspdif)
   * @param  pCallback pointer to the Callback function
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HAL_SPDIFRX_CallbackIDTypeDef CallbackID,
-                                               pSPDIFRX_CallbackTypeDef pCallback)
+HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HAL_SPDIFRX_CallbackIDTypeDef CallbackID, pSPDIFRX_CallbackTypeDef pCallback)
 {
   HAL_StatusTypeDef status = HAL_OK;
 
-  if (pCallback == NULL)
+  if(pCallback == NULL)
   {
     /* Update the error code */
     hspdif->ErrorCode |= HAL_SPDIFRX_ERROR_INVALID_CALLBACK;
@@ -449,7 +440,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HA
   /* Process locked */
   __HAL_LOCK(hspdif);
 
-  if (HAL_SPDIFRX_STATE_READY == hspdif->State)
+  if(HAL_SPDIFRX_STATE_READY == hspdif->State)
   {
     switch (CallbackID)
     {
@@ -489,7 +480,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HA
         break;
     }
   }
-  else if (HAL_SPDIFRX_STATE_RESET == hspdif->State)
+  else if(HAL_SPDIFRX_STATE_RESET == hspdif->State)
   {
     switch (CallbackID)
     {
@@ -504,7 +495,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HA
       default :
         /* Update the error code */
         hspdif->ErrorCode |= HAL_SPDIFRX_ERROR_INVALID_CALLBACK;
-        /* Return error status */
+       /* Return error status */
         status =  HAL_ERROR;
         break;
     }
@@ -524,7 +515,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HA
 
 /**
   * @brief  Unregister a SPDIFRX Callback
-  *         SPDIFRX callback is redirected to the weak predefined callback
+  *         SPDIFRX callabck is redirected to the weak predefined callback
   * @param  hspdif SPDIFRX handle
   * @param  CallbackID ID of the callback to be unregistered
   *         This parameter can be one of the following values:
@@ -537,15 +528,14 @@ HAL_StatusTypeDef HAL_SPDIFRX_RegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HA
   *          @arg @ref HAL_SPDIFRX_MSPDEINIT_CB_ID  MspDeInit callback ID
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_SPDIFRX_UnRegisterCallback(SPDIFRX_HandleTypeDef *hspdif,
-                                                 HAL_SPDIFRX_CallbackIDTypeDef CallbackID)
+HAL_StatusTypeDef HAL_SPDIFRX_UnRegisterCallback(SPDIFRX_HandleTypeDef *hspdif, HAL_SPDIFRX_CallbackIDTypeDef CallbackID)
 {
-  HAL_StatusTypeDef status = HAL_OK;
+HAL_StatusTypeDef status = HAL_OK;
 
   /* Process locked */
   __HAL_LOCK(hspdif);
 
-  if (HAL_SPDIFRX_STATE_READY == hspdif->State)
+  if(HAL_SPDIFRX_STATE_READY == hspdif->State)
   {
     switch (CallbackID)
     {
@@ -572,12 +562,12 @@ HAL_StatusTypeDef HAL_SPDIFRX_UnRegisterCallback(SPDIFRX_HandleTypeDef *hspdif,
       default :
         /* Update the error code */
         hspdif->ErrorCode |= HAL_SPDIFRX_ERROR_INVALID_CALLBACK;
-        /* Return error status */
+       /* Return error status */
         status =  HAL_ERROR;
         break;
     }
   }
-  else if (HAL_SPDIFRX_STATE_RESET == hspdif->State)
+  else if(HAL_SPDIFRX_STATE_RESET == hspdif->State)
   {
     switch (CallbackID)
     {
@@ -623,7 +613,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_SetDataFormat(SPDIFRX_HandleTypeDef *hspdif, SPDIF
   uint32_t tmpreg;
 
   /* Check the SPDIFRX handle allocation */
-  if (hspdif == NULL)
+  if(hspdif == NULL)
   {
     return HAL_ERROR;
   }
@@ -639,9 +629,9 @@ HAL_StatusTypeDef HAL_SPDIFRX_SetDataFormat(SPDIFRX_HandleTypeDef *hspdif, SPDIF
   /* Reset the old SPDIFRX CR configuration */
   tmpreg = hspdif->Instance->CR;
 
-  if (((tmpreg & SPDIFRX_STATE_RCV) == SPDIFRX_STATE_RCV) &&
-      (((tmpreg & SPDIFRX_CR_DRFMT) != sDataFormat.DataFormat) ||
-       ((tmpreg & SPDIFRX_CR_RXSTEO) != sDataFormat.StereoMode)))
+  if(((tmpreg & SPDIFRX_STATE_RCV) == SPDIFRX_STATE_RCV) &&
+     (((tmpreg & SPDIFRX_CR_DRFMT) != sDataFormat.DataFormat) ||
+      ((tmpreg & SPDIFRX_CR_RXSTEO) != sDataFormat.StereoMode)))
   {
     return HAL_ERROR;
   }
@@ -705,8 +695,8 @@ HAL_StatusTypeDef HAL_SPDIFRX_SetDataFormat(SPDIFRX_HandleTypeDef *hspdif, SPDIF
         (++) HAL_SPDIFRX_CxCpltCallback()
 
 @endverbatim
-  * @{
-  */
+* @{
+*/
 
 /**
   * @brief  Receives an amount of data (Data Flow) in blocking mode.
@@ -717,19 +707,18 @@ HAL_StatusTypeDef HAL_SPDIFRX_SetDataFormat(SPDIFRX_HandleTypeDef *hspdif, SPDIF
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow(SPDIFRX_HandleTypeDef *hspdif, uint32_t *pData, uint16_t Size,
-                                              uint32_t Timeout)
+HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow(SPDIFRX_HandleTypeDef *hspdif, uint32_t *pData, uint16_t Size, uint32_t Timeout)
 {
   uint32_t tickstart;
   uint16_t sizeCounter = Size;
   uint32_t *pTmpBuf = pData;
 
-  if ((pData == NULL) || (Size == 0U))
+  if((pData == NULL ) || (Size == 0U))
   {
     return  HAL_ERROR;
   }
 
-  if (hspdif->State == HAL_SPDIFRX_STATE_READY)
+  if(hspdif->State == HAL_SPDIFRX_STATE_READY)
   {
     /* Process Locked */
     __HAL_LOCK(hspdif);
@@ -743,7 +732,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow(SPDIFRX_HandleTypeDef *hspdif, uin
     tickstart = HAL_GetTick();
 
     /* Wait until SYNCD flag is set */
-    if (SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_SYNCD, RESET, Timeout, tickstart) != HAL_OK)
+    if(SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_SYNCD, RESET, Timeout, tickstart) != HAL_OK)
     {
       return HAL_TIMEOUT;
     }
@@ -752,13 +741,13 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow(SPDIFRX_HandleTypeDef *hspdif, uin
     __HAL_SPDIFRX_RCV(hspdif);
 
     /* Receive data flow */
-    while (sizeCounter > 0U)
+    while(sizeCounter > 0U)
     {
       /* Get tick */
       tickstart = HAL_GetTick();
 
       /* Wait until RXNE flag is set */
-      if (SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_RXNE, RESET, Timeout, tickstart) != HAL_OK)
+      if(SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_RXNE, RESET, Timeout, tickstart) != HAL_OK)
       {
         return HAL_TIMEOUT;
       }
@@ -791,19 +780,18 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow(SPDIFRX_HandleTypeDef *hspdif, uin
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow(SPDIFRX_HandleTypeDef *hspdif, uint32_t *pData, uint16_t Size,
-                                              uint32_t Timeout)
+HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow(SPDIFRX_HandleTypeDef *hspdif, uint32_t *pData, uint16_t Size, uint32_t Timeout)
 {
   uint32_t tickstart;
   uint16_t sizeCounter = Size;
   uint32_t *pTmpBuf = pData;
 
-  if ((pData == NULL) || (Size == 0U))
+  if((pData == NULL ) || (Size == 0U))
   {
     return  HAL_ERROR;
   }
 
-  if (hspdif->State == HAL_SPDIFRX_STATE_READY)
+  if(hspdif->State == HAL_SPDIFRX_STATE_READY)
   {
     /* Process Locked */
     __HAL_LOCK(hspdif);
@@ -817,7 +805,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow(SPDIFRX_HandleTypeDef *hspdif, uin
     tickstart = HAL_GetTick();
 
     /* Wait until SYNCD flag is set */
-    if (SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_SYNCD, RESET, Timeout, tickstart) != HAL_OK)
+    if(SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_SYNCD, RESET, Timeout, tickstart) != HAL_OK)
     {
       return HAL_TIMEOUT;
     }
@@ -826,13 +814,13 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow(SPDIFRX_HandleTypeDef *hspdif, uin
     __HAL_SPDIFRX_RCV(hspdif);
 
     /* Receive control flow */
-    while (sizeCounter > 0U)
+    while(sizeCounter > 0U)
     {
       /* Get tick */
       tickstart = HAL_GetTick();
 
       /* Wait until CSRNE flag is set */
-      if (SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_CSRNE, RESET, Timeout, tickstart) != HAL_OK)
+      if(SPDIFRX_WaitOnFlagUntilTimeout(hspdif, SPDIFRX_FLAG_CSRNE, RESET, Timeout, tickstart) != HAL_OK)
       {
         return HAL_TIMEOUT;
       }
@@ -869,9 +857,9 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
 
   const HAL_SPDIFRX_StateTypeDef tempState = hspdif->State;
 
-  if ((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_CX))
+  if((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_CX))
   {
-    if ((pData == NULL) || (Size == 0U))
+    if((pData == NULL) || (Size == 0U))
     {
       return HAL_ERROR;
     }
@@ -897,7 +885,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
     /* Enable the SPDIFRX RXNE interrupt */
     __HAL_SPDIFRX_ENABLE_IT(hspdif, SPDIFRX_IT_RXNE);
 
-    if ((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
+    if((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
     {
       /* Start synchronization */
       __HAL_SPDIFRX_SYNC(hspdif);
@@ -907,8 +895,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
       {
         if (count == 0U)
         {
-          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt
-             process */
+          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt process */
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_RXNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_PERRIE);
@@ -917,7 +904,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_SYNCDIE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_IFEIE);
 
-          hspdif->State = HAL_SPDIFRX_STATE_READY;
+          hspdif->State= HAL_SPDIFRX_STATE_READY;
 
           /* Process Unlocked */
           __HAL_UNLOCK(hspdif);
@@ -955,9 +942,9 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
 
   const HAL_SPDIFRX_StateTypeDef tempState = hspdif->State;
 
-  if ((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_RX))
+  if((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_RX))
   {
-    if ((pData == NULL) || (Size == 0U))
+    if((pData == NULL ) || (Size == 0U))
     {
       return HAL_ERROR;
     }
@@ -983,7 +970,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
     /* Enable the SPDIFRX CSRNE interrupt */
     __HAL_SPDIFRX_ENABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
 
-    if ((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
+    if((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
     {
       /* Start synchronization */
       __HAL_SPDIFRX_SYNC(hspdif);
@@ -993,8 +980,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
       {
         if (count == 0U)
         {
-          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt
-             process */
+          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt process */
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_RXNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_PERRIE);
@@ -1003,7 +989,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_IT(SPDIFRX_HandleTypeDef *hspdif, 
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_SYNCDIE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_IFEIE);
 
-          hspdif->State = HAL_SPDIFRX_STATE_READY;
+          hspdif->State= HAL_SPDIFRX_STATE_READY;
 
           /* Process Unlocked */
           __HAL_UNLOCK(hspdif);
@@ -1041,12 +1027,12 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
 
   const HAL_SPDIFRX_StateTypeDef tempState = hspdif->State;
 
-  if ((pData == NULL) || (Size == 0U))
+  if((pData == NULL) || (Size == 0U))
   {
     return  HAL_ERROR;
   }
 
-  if ((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_CX))
+  if((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_CX))
   {
     /* Process Locked */
     __HAL_LOCK(hspdif);
@@ -1068,8 +1054,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
     hspdif->hdmaDrRx->XferErrorCallback = SPDIFRX_DMAError;
 
     /* Enable the DMA request */
-    if (HAL_DMA_Start_IT(hspdif->hdmaDrRx, (uint32_t)&hspdif->Instance->DR, (uint32_t)hspdif->pRxBuffPtr, Size) !=
-        HAL_OK)
+    if(HAL_DMA_Start_IT(hspdif->hdmaDrRx, (uint32_t)&hspdif->Instance->DR, (uint32_t)hspdif->pRxBuffPtr, Size) != HAL_OK)
     {
       /* Set SPDIFRX error */
       hspdif->ErrorCode = HAL_SPDIFRX_ERROR_DMA;
@@ -1086,7 +1071,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
     /* Enable RXDMAEN bit in SPDIFRX CR register for data flow reception*/
     hspdif->Instance->CR |= SPDIFRX_CR_RXDMAEN;
 
-    if ((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
+    if((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
     {
       /* Start synchronization */
       __HAL_SPDIFRX_SYNC(hspdif);
@@ -1096,8 +1081,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
       {
         if (count == 0U)
         {
-          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt
-             process */
+          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt process */
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_RXNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_PERRIE);
@@ -1106,7 +1090,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveDataFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_SYNCDIE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_IFEIE);
 
-          hspdif->State = HAL_SPDIFRX_STATE_READY;
+          hspdif->State= HAL_SPDIFRX_STATE_READY;
 
           /* Process Unlocked */
           __HAL_UNLOCK(hspdif);
@@ -1144,12 +1128,12 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
 
   const HAL_SPDIFRX_StateTypeDef tempState = hspdif->State;
 
-  if ((pData == NULL) || (Size == 0U))
+  if((pData == NULL) || (Size == 0U))
   {
     return  HAL_ERROR;
   }
 
-  if ((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_RX))
+  if((tempState == HAL_SPDIFRX_STATE_READY) || (tempState == HAL_SPDIFRX_STATE_BUSY_RX))
   {
     hspdif->pCsBuffPtr = pData;
     hspdif->CsXferSize = Size;
@@ -1171,8 +1155,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
     hspdif->hdmaCsRx->XferErrorCallback = SPDIFRX_DMAError;
 
     /* Enable the DMA request */
-    if (HAL_DMA_Start_IT(hspdif->hdmaCsRx, (uint32_t)&hspdif->Instance->CSR, (uint32_t)hspdif->pCsBuffPtr, Size) !=
-        HAL_OK)
+    if(HAL_DMA_Start_IT(hspdif->hdmaCsRx, (uint32_t)&hspdif->Instance->CSR, (uint32_t)hspdif->pCsBuffPtr, Size) != HAL_OK)
     {
       /* Set SPDIFRX error */
       hspdif->ErrorCode = HAL_SPDIFRX_ERROR_DMA;
@@ -1189,7 +1172,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
     /* Enable CBDMAEN bit in SPDIFRX CR register for control flow reception*/
     hspdif->Instance->CR |= SPDIFRX_CR_CBDMAEN;
 
-    if ((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
+    if((SPDIFRX->CR & SPDIFRX_CR_SPDIFEN) != SPDIFRX_STATE_RCV)
     {
       /* Start synchronization */
       __HAL_SPDIFRX_SYNC(hspdif);
@@ -1199,8 +1182,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
       {
         if (count == 0U)
         {
-          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt
-             process */
+          /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt process */
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_RXNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_PERRIE);
@@ -1209,7 +1191,7 @@ HAL_StatusTypeDef HAL_SPDIFRX_ReceiveCtrlFlow_DMA(SPDIFRX_HandleTypeDef *hspdif,
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_SYNCDIE);
           __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_IFEIE);
 
-          hspdif->State = HAL_SPDIFRX_STATE_READY;
+          hspdif->State= HAL_SPDIFRX_STATE_READY;
 
           /* Process Unlocked */
           __HAL_UNLOCK(hspdif);
@@ -1249,14 +1231,8 @@ HAL_StatusTypeDef HAL_SPDIFRX_DMAStop(SPDIFRX_HandleTypeDef *hspdif)
   hspdif->Instance->CR &= (uint16_t)(~SPDIFRX_CR_CBDMAEN);
 
   /* Disable the SPDIFRX DMA channel */
-  if (hspdif->hdmaDrRx != NULL)
-  {
-    __HAL_DMA_DISABLE(hspdif->hdmaDrRx);
-  }
-  if (hspdif->hdmaCsRx != NULL)
-  {
-    __HAL_DMA_DISABLE(hspdif->hdmaCsRx);
-  }
+  __HAL_DMA_DISABLE(hspdif->hdmaDrRx);
+  __HAL_DMA_DISABLE(hspdif->hdmaCsRx);
 
   /* Disable SPDIFRX peripheral */
   __HAL_SPDIFRX_IDLE(hspdif);
@@ -1280,21 +1256,21 @@ void HAL_SPDIFRX_IRQHandler(SPDIFRX_HandleTypeDef *hspdif)
   uint32_t itSource = hspdif->Instance->IMR;
 
   /* SPDIFRX in mode Data Flow Reception */
-  if (((itFlag & SPDIFRX_FLAG_RXNE) == SPDIFRX_FLAG_RXNE) && ((itSource &  SPDIFRX_IT_RXNE) == SPDIFRX_IT_RXNE))
+  if(((itFlag & SPDIFRX_FLAG_RXNE) == SPDIFRX_FLAG_RXNE) && ((itSource &  SPDIFRX_IT_RXNE) == SPDIFRX_IT_RXNE))
   {
     __HAL_SPDIFRX_CLEAR_IT(hspdif, SPDIFRX_IT_RXNE);
     SPDIFRX_ReceiveDataFlow_IT(hspdif);
   }
 
   /* SPDIFRX in mode Control Flow Reception */
-  if (((itFlag & SPDIFRX_FLAG_CSRNE) == SPDIFRX_FLAG_CSRNE) && ((itSource &  SPDIFRX_IT_CSRNE) == SPDIFRX_IT_CSRNE))
+  if(((itFlag & SPDIFRX_FLAG_CSRNE) == SPDIFRX_FLAG_CSRNE) && ((itSource &  SPDIFRX_IT_CSRNE) == SPDIFRX_IT_CSRNE))
   {
     __HAL_SPDIFRX_CLEAR_IT(hspdif, SPDIFRX_IT_CSRNE);
     SPDIFRX_ReceiveControlFlow_IT(hspdif);
   }
 
   /* SPDIFRX Overrun error interrupt occurred */
-  if (((itFlag & SPDIFRX_FLAG_OVR) == SPDIFRX_FLAG_OVR) && ((itSource &  SPDIFRX_IT_OVRIE) == SPDIFRX_IT_OVRIE))
+  if(((itFlag & SPDIFRX_FLAG_OVR) == SPDIFRX_FLAG_OVR) && ((itSource &  SPDIFRX_IT_OVRIE) == SPDIFRX_IT_OVRIE))
   {
     __HAL_SPDIFRX_CLEAR_IT(hspdif, SPDIFRX_IT_OVRIE);
 
@@ -1306,7 +1282,7 @@ void HAL_SPDIFRX_IRQHandler(SPDIFRX_HandleTypeDef *hspdif)
   }
 
   /* SPDIFRX Parity error interrupt occurred */
-  if (((itFlag & SPDIFRX_FLAG_PERR) == SPDIFRX_FLAG_PERR) && ((itSource &  SPDIFRX_IT_PERRIE) == SPDIFRX_IT_PERRIE))
+  if(((itFlag & SPDIFRX_FLAG_PERR) == SPDIFRX_FLAG_PERR) && ((itSource &  SPDIFRX_IT_PERRIE) == SPDIFRX_IT_PERRIE))
   {
     __HAL_SPDIFRX_CLEAR_IT(hspdif, SPDIFRX_IT_PERRIE);
 
@@ -1417,7 +1393,7 @@ and the data flow.
   * @param  hspdif SPDIFRX handle
   * @retval HAL state
   */
-HAL_SPDIFRX_StateTypeDef HAL_SPDIFRX_GetState(SPDIFRX_HandleTypeDef const *const hspdif)
+HAL_SPDIFRX_StateTypeDef HAL_SPDIFRX_GetState(SPDIFRX_HandleTypeDef const * const hspdif)
 {
   return hspdif->State;
 }
@@ -1427,7 +1403,7 @@ HAL_SPDIFRX_StateTypeDef HAL_SPDIFRX_GetState(SPDIFRX_HandleTypeDef const *const
   * @param  hspdif SPDIFRX handle
   * @retval SPDIFRX Error Code
   */
-uint32_t HAL_SPDIFRX_GetError(SPDIFRX_HandleTypeDef const *const hspdif)
+uint32_t HAL_SPDIFRX_GetError(SPDIFRX_HandleTypeDef const * const hspdif)
 {
   return hspdif->ErrorCode;
 }
@@ -1443,10 +1419,10 @@ uint32_t HAL_SPDIFRX_GetError(SPDIFRX_HandleTypeDef const *const hspdif)
   */
 static void SPDIFRX_DMARxCplt(DMA_HandleTypeDef *hdma)
 {
-  SPDIFRX_HandleTypeDef *hspdif = (SPDIFRX_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+  SPDIFRX_HandleTypeDef* hspdif = ( SPDIFRX_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
 
   /* Disable Rx DMA Request */
-  if (hdma->Init.Mode != DMA_CIRCULAR)
+  if(hdma->Init.Mode != DMA_CIRCULAR)
   {
     hspdif->Instance->CR &= (uint16_t)(~SPDIFRX_CR_RXDMAEN);
     hspdif->RxXferCount = 0;
@@ -1466,7 +1442,7 @@ static void SPDIFRX_DMARxCplt(DMA_HandleTypeDef *hdma)
   */
 static void SPDIFRX_DMARxHalfCplt(DMA_HandleTypeDef *hdma)
 {
-  SPDIFRX_HandleTypeDef *hspdif = (SPDIFRX_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+  SPDIFRX_HandleTypeDef* hspdif = (SPDIFRX_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
   hspdif->RxHalfCpltCallback(hspdif);
@@ -1483,7 +1459,7 @@ static void SPDIFRX_DMARxHalfCplt(DMA_HandleTypeDef *hdma)
   */
 static void SPDIFRX_DMACxCplt(DMA_HandleTypeDef *hdma)
 {
-  SPDIFRX_HandleTypeDef *hspdif = (SPDIFRX_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+  SPDIFRX_HandleTypeDef* hspdif = ( SPDIFRX_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
 
   /* Disable Cb DMA Request */
   hspdif->Instance->CR &= (uint16_t)(~SPDIFRX_CR_CBDMAEN);
@@ -1504,7 +1480,7 @@ static void SPDIFRX_DMACxCplt(DMA_HandleTypeDef *hdma)
   */
 static void SPDIFRX_DMACxHalfCplt(DMA_HandleTypeDef *hdma)
 {
-  SPDIFRX_HandleTypeDef *hspdif = (SPDIFRX_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+  SPDIFRX_HandleTypeDef* hspdif = (SPDIFRX_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
   hspdif->CxHalfCpltCallback(hspdif);
@@ -1520,13 +1496,13 @@ static void SPDIFRX_DMACxHalfCplt(DMA_HandleTypeDef *hdma)
   */
 static void SPDIFRX_DMAError(DMA_HandleTypeDef *hdma)
 {
-  SPDIFRX_HandleTypeDef *hspdif = (SPDIFRX_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+  SPDIFRX_HandleTypeDef* hspdif = ( SPDIFRX_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
 
   /* Disable Rx and Cb DMA Request */
   hspdif->Instance->CR &= (uint16_t)(~(SPDIFRX_CR_RXDMAEN | SPDIFRX_CR_CBDMAEN));
   hspdif->RxXferCount = 0;
 
-  hspdif->State = HAL_SPDIFRX_STATE_READY;
+  hspdif->State= HAL_SPDIFRX_STATE_READY;
 
   /* Set the error code and execute error callback*/
   hspdif->ErrorCode |= HAL_SPDIFRX_ERROR_DMA;
@@ -1552,7 +1528,7 @@ static void SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif)
   hspdif->pRxBuffPtr++;
   hspdif->RxXferCount--;
 
-  if (hspdif->RxXferCount == 0U)
+  if(hspdif->RxXferCount == 0U)
   {
     /* Disable RXNE/PE and OVR interrupts */
     __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_OVRIE | SPDIFRX_IT_PERRIE | SPDIFRX_IT_RXNE);
@@ -1563,9 +1539,9 @@ static void SPDIFRX_ReceiveDataFlow_IT(SPDIFRX_HandleTypeDef *hspdif)
     __HAL_UNLOCK(hspdif);
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
-    hspdif->RxCpltCallback(hspdif);
+  hspdif->RxCpltCallback(hspdif);
 #else
-    HAL_SPDIFRX_RxCpltCallback(hspdif);
+  HAL_SPDIFRX_RxCpltCallback(hspdif);
 #endif /* USE_HAL_SPDIFRX_REGISTER_CALLBACKS */
   }
 }
@@ -1582,7 +1558,7 @@ static void SPDIFRX_ReceiveControlFlow_IT(SPDIFRX_HandleTypeDef *hspdif)
   hspdif->pCsBuffPtr++;
   hspdif->CsXferCount--;
 
-  if (hspdif->CsXferCount == 0U)
+  if(hspdif->CsXferCount == 0U)
   {
     /* Disable CSRNE interrupt */
     __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
@@ -1593,9 +1569,9 @@ static void SPDIFRX_ReceiveControlFlow_IT(SPDIFRX_HandleTypeDef *hspdif)
     __HAL_UNLOCK(hspdif);
 
 #if (USE_HAL_SPDIFRX_REGISTER_CALLBACKS == 1)
-    hspdif->CxCpltCallback(hspdif);
+  hspdif->CxCpltCallback(hspdif);
 #else
-    HAL_SPDIFRX_CxCpltCallback(hspdif);
+  HAL_SPDIFRX_CxCpltCallback(hspdif);
 #endif /* USE_HAL_SPDIFRX_REGISTER_CALLBACKS */
   }
 }
@@ -1609,19 +1585,17 @@ static void SPDIFRX_ReceiveControlFlow_IT(SPDIFRX_HandleTypeDef *hspdif)
   * @param tickstart Tick start value
   * @retval HAL status
   */
-static HAL_StatusTypeDef SPDIFRX_WaitOnFlagUntilTimeout(SPDIFRX_HandleTypeDef *hspdif, uint32_t Flag,
-                                                        FlagStatus Status, uint32_t Timeout, uint32_t tickstart)
+static HAL_StatusTypeDef SPDIFRX_WaitOnFlagUntilTimeout(SPDIFRX_HandleTypeDef *hspdif, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t tickstart)
 {
   /* Wait until flag is set */
-  while (__HAL_SPDIFRX_GET_FLAG(hspdif, Flag) == Status)
+  while(__HAL_SPDIFRX_GET_FLAG(hspdif, Flag) == Status)
   {
     /* Check for the Timeout */
-    if (Timeout != HAL_MAX_DELAY)
+    if(Timeout != HAL_MAX_DELAY)
     {
-      if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
+      if(((HAL_GetTick() - tickstart ) > Timeout) || (Timeout == 0U))
       {
-        /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt
-           process */
+        /* Disable TXE, RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts for the interrupt process */
         __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_RXNE);
         __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_CSRNE);
         __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_PERRIE);
@@ -1630,7 +1604,7 @@ static HAL_StatusTypeDef SPDIFRX_WaitOnFlagUntilTimeout(SPDIFRX_HandleTypeDef *h
         __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_SYNCDIE);
         __HAL_SPDIFRX_DISABLE_IT(hspdif, SPDIFRX_IT_IFEIE);
 
-        hspdif->State = HAL_SPDIFRX_STATE_READY;
+        hspdif->State= HAL_SPDIFRX_STATE_READY;
 
         /* Process Unlocked */
         __HAL_UNLOCK(hspdif);
